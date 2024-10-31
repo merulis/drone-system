@@ -12,3 +12,6 @@ class Settings(BaseSettings):
     MQTT_BROKER_PORT: int
     MQTT_BROKER_USER: str
     MQTT_BROKER_PASSWORD: str
+
+
+settings = Settings()
