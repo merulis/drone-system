@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "system"
+version = "0.1.0"
+description = ""
+authors = ["merulis <merulis@yandex.ru>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+paho-mqtt = "^2.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.0.1"
+ruff = "^0.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
