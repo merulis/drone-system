@@ -3,9 +3,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
+        # Dump constants from top level /.env file
         env_file="../.env",
         env_ignore_empty=True,
-        extra=True,
+        extra="ignore",
     )
 
     MQTT_BROKER_HOST: str
