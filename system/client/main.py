@@ -1,7 +1,8 @@
 import logging
 
-import paho.mqtt.client as mqtt
+from system.core.settings import settings
 
+import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
 
 def on_connect(client, userdata, falgs, rc, props):
@@ -32,7 +33,15 @@ subscriber.on_disconnect = on_disconnet
 logger = logging.getLogger(__name__)
 subscriber.enable_logger(logger)
 
-subscriber.connect(host="localhost", port=1883)
+subscriber.username_pw_set(
+    username=settings.MQTT_BROKER_USER,
+    password=settings.MQTT_BROKER_PASSWORD,
+)
+subscriber.connect(
+    host=settings.MQTT_BROKER_HOST,
+    port=settings.MQTT_BROKER_PORT,
+)
+
 subscriber.subscribe(topic="test", qos=0)
 
 subscriber.loop_forever()

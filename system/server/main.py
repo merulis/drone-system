@@ -1,6 +1,8 @@
 import time
 import logging
 
+from system.core.settings import settings
+
 import paho.mqtt.client as mqtt
 
 
@@ -20,6 +22,7 @@ logging.basicConfig(level=logging.INFO)
 
 publisher = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
+
 publisher.on_connect = on_connect
 publisher.on_publish = on_publish
 publisher.on_disconnect = on_disconnet
@@ -27,8 +30,14 @@ publisher.on_disconnect = on_disconnet
 logger = logging.getLogger(__name__)
 publisher.enable_logger(logger)
 
-publisher.connect(host="localhost", port=1883)
-
+publisher.username_pw_set(
+    username=settings.MQTT_BROKER_USER,
+    password=settings.MQTT_BROKER_PASSWORD,
+)
+publisher.connect(
+    host=settings.MQTT_BROKER_HOST,
+    port=settings.MQTT_BROKER_PORT,
+)
 
 publisher.loop_start()
 
