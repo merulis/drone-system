@@ -21,5 +21,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
-print(settings.MQTT_BROKER_USER)

@@ -5,6 +5,7 @@ from system.core.settings import settings
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
 
+
 def on_connect(client, userdata, falgs, rc, props):
     logger.info(f"Connected with result code {str(rc)}")
 
