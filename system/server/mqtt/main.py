@@ -1,5 +1,5 @@
 from system.core.settings import settings
-from system.server.mqtt_tools.broker import MQTTClientBackendSide
+from system.server.mqtt.broker import MQTTClientBackendSide
 
 publisher = MQTTClientBackendSide()
 publisher.start_connetion(
