@@ -1,8 +1,5 @@
-import time
-
 from system.core.settings import settings
-from system.server.brocker import MQTTClientBackendSide
-
+from system.server.mqtt_tools.broker import MQTTClientBackendSide
 
 publisher = MQTTClientBackendSide()
 publisher.start_connetion(
@@ -11,12 +8,3 @@ publisher.start_connetion(
     host=settings.MQTT_BROKER_HOST,
     port=settings.MQTT_BROKER_PORT,
 )
-
-publisher.loop_start()
-
-for i in range(100):
-    time.sleep(2)
-    publisher.publish(topic="test", qos=0, payload=f"Test message {i}")
-
-publisher.loop_stop()
-publisher.disconnect()
