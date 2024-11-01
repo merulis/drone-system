@@ -1,8 +1,12 @@
 import logging
 
-from system.core.settings import settings
-
-from paho.mqtt.client import LogLevel, Client, MQTTv5, CallbackAPIVersion, MQTTMessage
+from paho.mqtt.client import (
+    LogLevel,
+    Client,
+    MQTTv5,
+    CallbackAPIVersion,
+    MQTTMessage,
+)
 
 
 class MQTTClientDroneSide(Client):
@@ -31,7 +35,7 @@ class MQTTClientDroneSide(Client):
         if logger:
             self.logger = logger
         else:
-            self.logger = logging.getLogger(__name__)
+            self.logger = logging.getLogger("MQTT")
 
     def on_message(self, client, userdata, message: MQTTMessage):
         self.logger.info(f"Message: {message.payload.decode()}")
