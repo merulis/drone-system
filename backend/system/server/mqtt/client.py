@@ -8,7 +8,7 @@ from paho.mqtt.client import (
 )
 
 
-class MQTTClientBackendSide(Client):
+class MQTTClient(Client):
     def __init__(
         self,
         callback_api_version=CallbackAPIVersion.VERSION2,
