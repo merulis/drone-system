@@ -1,0 +1,31 @@
+services:
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+
+    ports:
+      - 1883:1883
+
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+
+  server:
+    container_name: server
+
+    build:
+      context: .
+      dockerfile: ./backend/dockerfile
+
+    env_file:
+      - .env
+
+    environment:
+      - MQTT_BROKER_HOST=mosquitto
+      - MQTT_BROKER_PORT=${MQTT_BROKER_PORT}
+      - MQTT_BROKER_USER=${MQTT_BROKER_USER}
+      - MQTT_BROKER_PASSWORD=${MQTT_BROKER_PASSWORD}
+
+    depends_on:
+      - mosquitto
