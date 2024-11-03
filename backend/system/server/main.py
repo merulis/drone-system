@@ -1,5 +1,8 @@
-from system
+import time
+
+from system.core.settings import settings
 from system.server.mqtt.client import MQTTClient
+
 
 publisher = MQTTClient()
 publisher.start_connetion(
@@ -12,4 +15,5 @@ publisher.start_connetion(
 publisher.publish("test", "Hello MQTT!")
 
 while True:
-    pass
+    time.sleep(0.5)
+    publisher.publish("test", "Hello MQTT")
