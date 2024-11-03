@@ -6,17 +6,24 @@ services:
 
     ports:
       - 1883:1883
+      - 9001:9001
 
     volumes:
-      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw
+      - ./mosquitto/passwdfile:/mosquitto/config/passwdfile:rw
 
+  mqttx-web:
+    image: emqx/mqttx-web
+
+    ports:
+      - 80:80
 
   server:
     container_name: server
 
     build:
-      context: .
-      dockerfile: ./backend/dockerfile
+      context: ./backend
+      dockerfile: ./dockerfile
 
     env_file:
       - .env
