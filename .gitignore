@@ -1,6 +1,9 @@
 # ruff
 /.ruff_cache
 
+# mossquitto files
+passwdfile
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
