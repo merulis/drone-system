@@ -4,6 +4,20 @@ api:
 log:
   level: DEBUG
 
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+  
+certificatesResolvers:
+  le:
+    acme:
+      email: merulis@yandex.ru
+      storage: /letsebcrypt/acme.json
+      tlsChallenge: {}
+  
+
 providers:
   docker:
     exposedByDefault: false
