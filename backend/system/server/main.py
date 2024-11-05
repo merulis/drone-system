@@ -15,5 +15,5 @@ publisher.start_connetion(
 publisher.publish("test", "Hello MQTT!")
 
 while True:
-    time.sleep(0.5)
+    time.sleep(5)
     publisher.publish("test", "Hello MQTT")
