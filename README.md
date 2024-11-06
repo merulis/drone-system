@@ -14,6 +14,6 @@
     Copy that in .env like for example
 
     ```
-        TRAEFIK_USER="your_user"
-        TRAEFIK_HASH_PASSWORD="$$apr1$$kuCA0.qi$$XTPSRk8lxwbGOlebYM1Aa/"
+    TRAEFIK_USER="your_user"
+    TRAEFIK_HASH_PASSWORD="$$apr1$$kuCA0.qi$$XTPSRk8lxwbGOlebYM1Aa/"
     ```
