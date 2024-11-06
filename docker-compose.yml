@@ -20,8 +20,8 @@ services:
 
       - "--entrypoints.http.address=:80"
       - "--entrypoints.https.address=:443"
-      - "--entrypoints.http.http.redorections.entrypoint.to=https"
-      - "--entrypoints.http.http.redorections.entrypoint.scheme=https"
+      - "--entrypoints.http.http.redirections.entrypoint.to=https"
+      - "--entrypoints.http.http.redirections.entrypoint.scheme=https"
 
       - "--entrypoints.https.http.tls.certResolver=le"
       - "--certificatesresolvers.le.acme.tlschallenge=true"
