@@ -7,14 +7,15 @@ log:
 entryPoints:
   web:
     address: ":80"
+
   websecure:
     address: ":443"
   
 certificatesResolvers:
   le:
     acme:
-      email: merulis@yandex.ru
-      storage: /letsencrypt/acme.json
+      email: ${EMAIL}
+      storage: /certificates/acme.json
       tlsChallenge: {}
   
 

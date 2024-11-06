@@ -11,12 +11,25 @@ services:
     
     restart: always
 
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--log.level=DEBUG"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.networks=proxynet"
+
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+
+      - "--entrypoints.https.http.tls.certResolver=le"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.email=${EMAIL}"
+      - "--certificatesresolvers.le.acme.storage=/certificates/acme.json"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      # Add static config for traefik
-      -  ./traefik.yml:/etc/traefik/traefik.yml:ro
-      # add Let's Encrypt
-      - ./letsencrypt:/letsencrypt
+      # add Let's Encrypt certs
+      - ./certificates:/certificates
 
 
   mosquitto:
