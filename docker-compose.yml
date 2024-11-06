@@ -16,7 +16,7 @@ services:
       - "--providers.docker"
       - "--log.level=DEBUG"
       - "--providers.docker.exposedByDefault=false"
-      - "--providers.docker.networks=proxynet"
+      - "--providers.docker.network=proxynet"
 
       - "--entrypoints.http.address=:80"
       - "--entrypoints.https.address=:443"
