@@ -56,12 +56,18 @@ services:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw
       - ./mosquitto/passwdfile:/mosquitto/config/passwdfile:rw
 
+
   mqtt-web:
     image: emqx/mqttx-web
+    container_name: mqtt-web
 
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mqtt.rule=Host(`mqtt.${DOMAIN}`)"
+      - traefik.enable=true
+      - traefik.http.routers.mqtt.rule=Host(`mqtt.${DOMAIN}`)
+      - traefik.http.routers.mqtt.entrypoints=https
+      - traefik.http.routers.mqtt.middlewares=auth
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_HASH_PASSWORD}
+
 
   server:
     container_name: server
