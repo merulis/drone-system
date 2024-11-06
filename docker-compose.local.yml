@@ -36,6 +36,7 @@ services:
 
   mqtt-web:
     image: emqx/mqttx-web
+    container_name: mqtt-web
 
     labels:
       - "traefik.enable=true"
