@@ -31,7 +31,7 @@ services:
       - "--entrypoints.https.address=:443"
       - "--entrypoints.http.http.redirections.entrypoint.to=https"
       - "--entrypoints.http.http.redirections.entrypoint.scheme=https"
-      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.http.http.redirections.entrypoint.permanent=true"
 
       - "--entrypoints.https.http.tls.certResolver=le"
       - "--certificatesresolvers.le.acme.tlschallenge=true"
