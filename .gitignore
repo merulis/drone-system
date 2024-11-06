@@ -4,6 +4,9 @@
 # mossquitto files
 passwdfile
 
+# lest's encrypt
+/letsencrypt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

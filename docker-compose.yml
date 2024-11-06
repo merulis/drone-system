@@ -16,7 +16,7 @@ services:
       # Add static config for traefik
       -  ./traefik.yml:/etc/traefik/traefik.yml:ro
       # add Let's Encrypt
-      - ./letsencrypt:letsencrypt
+      - ./letsencrypt:/letsencrypt
 
 
   mosquitto:

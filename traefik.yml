@@ -14,7 +14,7 @@ certificatesResolvers:
   le:
     acme:
       email: merulis@yandex.ru
-      storage: /letsebcrypt/acme.json
+      storage: /letsencrypt/acme.json
       tlsChallenge: {}
   
 
