@@ -4,15 +4,23 @@ services:
     image: traefik:latest
     container_name: traefik
 
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.dashboard.entrypoints=https"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_HASH_PASSWORD}"
+
     ports:
       - "80:80"
-      - "443:443" 
-      - "8080:8080"
+      - "443:443"
     
     restart: always
 
     command:
-      - "--api.insecure=true"
+      - "--api.insecure=false"
+      - "--api.dashboard=true"
       - "--providers.docker"
       - "--log.level=DEBUG"
       - "--providers.docker.exposedByDefault=false"
