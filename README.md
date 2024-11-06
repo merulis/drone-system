@@ -1,6 +1,8 @@
 # drone-system
 
 # Set TRAEFIK_HASH_PASS
+[traefik_docs](https://doc.traefik.io/traefik/middlewares/http/basicauth/)
+
 1. Complite 
     ```bash
     echo $(htpasswd -nb your_user your_passwd) | sed -e s/\\$/\\$\\$/g
