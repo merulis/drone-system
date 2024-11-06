@@ -5,13 +5,13 @@
 
 1. Complite 
     ```bash
-    echo $(htpasswd -nb your_user your_passwd) | sed -e s/\\$/\\$\\$/g
+    $ echo $(htpasswd -nb your_user your_passwd) | sed -e s/\\$/\\$\\$/g
     ```
 2. You will see
     ```bash
-    your_user:$$apr1$$kuCA0.qi$$XTPSRk8lxwbGOlebYM1Aa/
+    $ your_user:$$apr1$$kuCA0.qi$$XTPSRk8lxwbGOlebYM1Aa/
     ```
-    Copy that in .env like for example
+3. Copy that in .env like the example
 
     ```
     TRAEFIK_USER="your_user"
