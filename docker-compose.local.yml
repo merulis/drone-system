@@ -1,0 +1,65 @@
+services:
+
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+
+    ports:
+      - "80:80"
+      - "8080:8080"
+    
+    restart: always
+
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--log.level=DEBUG"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.network=local"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw
+      - ./mosquitto/passwdfile:/mosquitto/config/passwdfile:rw
+
+  mqtt-web:
+    image: emqx/mqttx-web
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mqtt.rule=Host(`mqtt.${DOMAIN}`)"
+
+  server:
+    container_name: server
+
+    build:
+      context: ./backend
+      dockerfile: ./dockerfile
+
+    env_file:
+      - .env
+
+    environment:
+      - MQTT_BROKER_HOST=mosquitto
+      - MQTT_BROKER_PORT=${MQTT_BROKER_PORT}
+      - MQTT_BROKER_USER=${MQTT_BROKER_USER}
+      - MQTT_BROKER_PASSWORD=${MQTT_BROKER_PASSWORD}
+
+    depends_on:
+      - mosquitto
+
+networks:
+  local:
+    external: false
