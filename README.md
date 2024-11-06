@@ -1,7 +1,8 @@
 # drone-system
 
 # Set TRAEFIK_HASH_PASS
-[traefik_docs](https://doc.traefik.io/traefik/middlewares/http/basicauth/)
+
+Look offical docs from [traefik](https://doc.traefik.io/traefik/middlewares/http/basicauth/)
 
 1. Complite 
     ```bash
