@@ -52,8 +52,8 @@ services:
 
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mqtt.rule=Host(`grafana.${DOMAIN}`)
-      - traefik.http.routers.mqtt.entrypoints=https
+      - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
+      - traefik.http.routers.grafana.entrypoints=https
 
 
   mosquitto:
