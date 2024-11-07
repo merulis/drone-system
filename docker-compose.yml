@@ -7,11 +7,17 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxynet
+
       - traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN}`)
       - traefik.http.routers.dashboard.entrypoints=https
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.routers.dashboard.middlewares=auth
+
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_HASH_PASSWORD}
+
+      - traefik.https.middlewares.redirect-to-domain.redirectregex.regex=^https?://[0-9.]+(:[0-9]+)?(.*)
+      - traefik.https.middlewares.redirect-to-domain.redirectregex.replacemet=https://${DOMAIN}
+      - traefik.https.middlewares.redirect-to-domain.redirectregex.permanent=true
 
     ports:
       - "80:80"
