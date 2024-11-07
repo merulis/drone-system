@@ -38,13 +38,13 @@ services:
       - "--certificatesresolvers.le.acme.email=${EMAIL}"
       - "--certificatesresolvers.le.acme.storage=/certificates/acme.json"
 
-      - "--http.middlewares.redirect-to-domain.redirectregex.regex=^https?://[0-9.]+(:[0-9]+)?(.*)"
-      - "--http.middlewares.redirect-to-domain.redirectregex.replacemet=https://${DOMAIN}"
-      - "--http.middlewares.redirect-to-domain.redirectregex.permanent=true"
+      - "--https.middlewares.redirect-to-domain.redirectregex.regex=^https?://[0-9.]+(:[0-9]+)?(.*)"
+      - "--https.middlewares.redirect-to-domain.redirectregex.replacemet=https://${DOMAIN}"
+      - "--https.middlewares.redirect-to-domain.redirectregex.permanent=true"
 
-      - "--http.routers.redirect-ip-to-domain.rule=HostRegexp(`{host:[0-9.]+}`)"
-      - "--http.routers.redirect-ip-to-domain.entrypoints=http`)"
-      - "--http.routers.redirect-ip-to-domain.middlewares=redirect-to-domain`)"
+      - "--https.routers.redirect-ip-to-domain.rule=HostRegexp(`{host:[0-9.]+}`)"
+      - "--https.routers.redirect-ip-to-domain.entrypoints=http`)"
+      - "--https.routers.redirect-ip-to-domain.middlewares=redirect-to-domain`)"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
