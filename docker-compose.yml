@@ -46,6 +46,16 @@ services:
       - ./certificates:/certificates
 
 
+  grafana:
+    image: grafana/grafana:latest-ubuntu
+    container_name: grafana
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mqtt.rule=Host(`grafana.${DOMAIN}`)
+      - traefik.http.routers.mqtt.entrypoints=https
+
+
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto
