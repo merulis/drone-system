@@ -32,11 +32,19 @@ services:
       - "--entrypoints.http.http.redirections.entrypoint.to=https"
       - "--entrypoints.http.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.http.http.redirections.entrypoint.permanent=true"
-
       - "--entrypoints.https.http.tls.certResolver=le"
+
       - "--certificatesresolvers.le.acme.tlschallenge=true"
       - "--certificatesresolvers.le.acme.email=${EMAIL}"
       - "--certificatesresolvers.le.acme.storage=/certificates/acme.json"
+
+      - "http.middlewares.redirect-to-domain.redirectregex.regex=^https?://[0-9.]+(:[0-9]+)?(.*)"
+      - "http.middlewares.redirect-to-domain.redirectregex.replacemet=https://${DOMAIN}"
+      - "http.middlewares.redirect-to-domain.redirectregex.permanent=true"
+
+      - "--http.routers.redirect-ip-to-domain.rule=HostRegexp(`{host:[0-9.]+}`)"
+      - "--http.routers.redirect-ip-to-domain.entrypoints=http`)"
+      - "--http.routers.redirect-ip-to-domain.middlewares=redirect-to-domain`)"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
