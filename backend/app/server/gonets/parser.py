@@ -10,6 +10,20 @@ import base64
 from app.core.settings import settings
 
 
+cookies_needs = [
+    "_ym_d",
+    "_ym_isad",
+    "_ym_uid",
+    "_ym_visorc",
+    "ASP.NET_SessionId",
+    "fullNameGS",
+    "trueUserV",
+    "userClientGS",
+    "userLoginGS",
+    "userNameGS",
+]
+
+
 def solve_captcha(encoded_data):
     solver = TwoCaptcha(apiKey=settings.CAPTCHA.API_KEY)
 
@@ -72,7 +86,10 @@ def main():
     result = solve_captcha(encoded_captcha)
     fill_form_and_enter(driver, result)
 
+    cookies = [driver.get_cookie(cookie_name) for cookie_name in cookies_needs]
     driver.quit()
+
+    print(cookies)
 
 
 main()
