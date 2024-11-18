@@ -1,7 +1,7 @@
 import time
 
-from system.core.settings import settings
-from system.server.mqtt.client import MQTTClient
+from app.core.settings import settings
+from app.server.mqtt.client import MQTTClient
 
 
 publisher = MQTTClient()
