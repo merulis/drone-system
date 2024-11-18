@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -20,6 +22,8 @@ class Gonets(BaseSettings):
     MAIN_URL: str
     LOGIN: str
     PASSWORD: str
+    MESSAGE_TYPES: Literal["input", "output", "send", "delete"]
+
 
 
 class AutoCaptcha(BaseSettings):
@@ -44,7 +48,7 @@ class Mqtt(BaseSettings):
         extra="ignore",
     )
 
-    HOST: str
+    HOST: str,
     PORT: int
     USER: str
     PASSWORD: str
