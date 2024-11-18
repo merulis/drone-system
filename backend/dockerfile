@@ -18,4 +18,4 @@ RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; els
 
 COPY . /usr/local/app/
 
-CMD ["python", "-m", "system.server.main"]
+CMD ["python", "-m", "app.server.main"]
