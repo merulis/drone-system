@@ -25,7 +25,6 @@ class Gonets(BaseSettings):
     MESSAGE_TYPES: Literal["input", "output", "send", "delete"]
 
 
-
 class AutoCaptcha(BaseSettings):
     model_config = SettingsConfigDict(
         # Dump constants from top level /.env file
@@ -48,7 +47,7 @@ class Mqtt(BaseSettings):
         extra="ignore",
     )
 
-    HOST: str,
+    HOST: str
     PORT: int
     USER: str
     PASSWORD: str
