@@ -1,5 +1,3 @@
-from typing import Literal
-
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -18,11 +16,29 @@ class Gonets(BaseSettings):
     )
 
     BASE_URL: str
-    LOGIN_URL: str
-    MAIN_URL: str
+    LOGIN_ROUTE: str
+    MAIN_ROUTE: str
+
+    LIST_MESSAGE_ROUTE: str
+    LIST_MESSAGE_JSON: dict = {
+        "what": "send",
+        "muid": "",
+        "track": "1",
+        "UIDA": "",
+        "Src": "",
+        "DateFrom": "",
+        "DateTo": "",
+        "noUpdate": 1,
+        "ID": "",
+        "jtStartIndex": "0",
+        "jtPageSize": "20",
+        "jtSorting": "m_DT DESC",
+    }
+    LIST_MESSAGE_USER_ID: str = "ID"
+    COOKIE_USER_LOGIN: str = "userLoginGS"
+
     LOGIN: str
     PASSWORD: str
-    MESSAGE_TYPES: Literal["input", "output", "send", "delete"]
 
 
 class AutoCaptcha(BaseSettings):
