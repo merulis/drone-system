@@ -10,7 +10,7 @@
     "DateFrom": "",
     "DateTo": "",
     "noUpdate": 1,
-    "ID": "152472855",
+    "ID": "",
     "jtStartIndex": "0",
     "jtPageSize": "20",
     "jtSorting": "m_DT DESC",
