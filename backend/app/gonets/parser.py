@@ -55,20 +55,17 @@ def get_user_id_from_cookies(cookies):
 
 
 async def main():
-    driver = create_webdriver()
+    with create_webdriver() as driver:
+        driver.get(settings.GONETS.BASE_URL + settings.GONETS.LOGIN_ROUTE)
 
-    driver.get(settings.GONETS.BASE_URL + settings.GONETS.LOGIN_ROUTE)
+        if not (encoded_captcha := get_captcha_as_base64_or_none(driver)):
+            print("Captcha not found, go to main page")
 
-    if not (encoded_captcha := get_captcha_as_base64_or_none(driver)):
-        print("Captcha not found, go to main page")
+        result = solve_captcha(encoded_captcha)
+        fill_form_and_enter(driver, result)
 
-    result = solve_captcha(encoded_captcha)
-    fill_form_and_enter(driver, result)
-
-    selenuim_cookies = get_cookies_aiohttp_format(driver)
-    user_id = get_user_id_from_cookies(selenuim_cookies)
-
-    driver.quit()
+        selenuim_cookies = get_cookies_aiohttp_format(driver)
+        user_id = get_user_id_from_cookies(selenuim_cookies)
 
     status, json = await get_messages(selenuim_cookies, user_id)
     print(status, json)
