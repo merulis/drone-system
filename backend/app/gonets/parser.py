@@ -1,5 +1,3 @@
-import asyncio
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -54,7 +52,7 @@ def get_user_id_from_cookies(cookies):
     return cookies.get(settings.GONETS.COOKIE_USER_LOGIN)
 
 
-async def main():
+async def parse_message():
     with create_webdriver() as driver:
         driver.get(settings.GONETS.BASE_URL + settings.GONETS.LOGIN_ROUTE)
 
@@ -68,7 +66,5 @@ async def main():
         user_id = get_user_id_from_cookies(selenuim_cookies)
 
     status, json = await get_messages(selenuim_cookies, user_id)
-    print(status, json)
 
-
-asyncio.run(main())
+    return status, json
