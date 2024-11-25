@@ -1,5 +1,17 @@
-services:
+networks:
+  local:
+    external: false
 
+
+volumes:
+  postgres_data:
+    driver: local
+
+  redis_data:
+    driver: local
+
+
+services:
   traefik:
     image: traefik:latest
     container_name: traefik
@@ -21,6 +33,50 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
 
+  db:
+    image: postgres:latest
+    container_name: postgresql_db
+
+    ports:
+      - "5432:5432"
+
+    env_file:
+      - .env
+
+    environment:
+      - POSTGRES_USER=value
+      - POSTGRES_PASSWORD=value
+      - POSTGRES_DB=value
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - local
+    depends_on:
+      - db
+    environment:
+      - ADMINER_DESIGN=pepa-linha-dark
+    labels:
+      - traefik.enable=true
+
+      - traefik.docker.network=local
+      - traefik.constraint-label=traefik-public
+
+      - traefik.http.routers.adminer-http.rule=Host(`adminer.localhost`)
+      - traefik.http.routers.adminer-http.entrypoints=http
+      - traefik.http.routers.adminer-http.middlewares=https-redirect
+      - traefik.http.routers.adminer-https.rule=Host(`adminer.localhost`)
+      - traefik.http.routers.adminer-https.entrypoints=https
+      - traefik.http.routers.adminer-https.tls=true
+      - traefik.http.routers.adminer-https.tls.certresolver=le
+      - traefik.http.services.adminer.loadbalancer.server.port=8080
+
+
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto
@@ -33,16 +89,28 @@ services:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw
       - ./mosquitto/passwdfile:/mosquitto/config/passwdfile:rw
 
+
+  redis:
+    image: redis:latest
+    container_name: redis
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+
   mqtt-web:
     image: emqx/mqttx-web
     container_name: mqtt-web
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mqtt.rule=Host(`mqtt.${DOMAIN}`)"
+      - "traefik.http.routers.mqtt.rule=Host(`mqtt.localhost`)"
 
-  server:
-    container_name: server
+  backend:
+    container_name: backend
 
     build:
       context: ./backend
@@ -60,6 +128,17 @@ services:
     depends_on:
       - mosquitto
 
-networks:
-  local:
-    external: false
+
+  celery_worker:
+    container_name: celery_worker
+    build: .
+    command: celery -A app.background.tasks.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - backend
+      - redis
+
