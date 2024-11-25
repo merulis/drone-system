@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from pydantic_core import MultiHostUrl
+from pydantic import RedisDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -51,7 +53,6 @@ class AutoCaptcha(BaseSettings):
     )
 
     API_KEY: str
-    IMG_FOLDER: Path = Path(__file__).parent.parent.parent / "captcha_img"
 
 
 class Mqtt(BaseSettings):
@@ -69,7 +70,52 @@ class Mqtt(BaseSettings):
     PASSWORD: str
 
 
+class Celery(BaseSettings):
+    model_config = SettingsConfigDict(
+        # Dump constants from top level /.env file
+        env_file=BASE_DIR / ".env",
+        env_prefix="CELERY_",
+        env_ignore_empty=True,
+        extra="ignore",
+    )
+
+    BROKER_SCHEME: str
+    BROKER_HOST: str
+    BROKER_PORT: str
+    BROKER_PASSWORD: str
+    BROKER_DB: str
+
+    BACKEND_SCHEME: str
+    BACKEND_HOST: str
+    BACKEND_PORT: str
+    BACKEND_PASSWORD: str
+    BACKEND_DB: str
+
+    @computed_field
+    @property
+    def BROCKER_URL(self) -> RedisDsn:
+        return MultiHostUrl.build(
+            scheme=self.BROKER_SCHEME,
+            password=self.BROKER_PASSWORD,
+            host=self.BROKER_HOST,
+            port=self.BROKER_PORT,
+            path=self.BROKER_DB,
+        )
+
+    @computed_field
+    @property
+    def BACKEND_URL(self) -> RedisDsn:
+        return MultiHostUrl.build(
+            scheme=self.BROKER_SCHEME,
+            password=self.BROKER_PASSWORD,
+            host=self.BROKER_HOST,
+            port=self.BROKER_PORT,
+            path=self.BROKER_DB,
+        )
+
+
 class Settings(BaseSettings):
+    CELERY: Celery = Celery()
     CAPTCHA: AutoCaptcha = AutoCaptcha()
     MQTT: Mqtt = Mqtt()
     GONETS: Gonets = Gonets()
