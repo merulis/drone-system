@@ -16,9 +16,9 @@ def create_webdriver(
         options = ["--headless"]
 
     driver_options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(options=driver_options)
-
     [driver_options.add_argument(option) for option in options]
+
+    driver = webdriver.Chrome(options=driver_options)
 
     return driver
 
