@@ -5,7 +5,7 @@
 passwdfile
 
 # lest's encrypt
-/certificates
+*/certificates
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
