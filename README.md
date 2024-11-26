@@ -1,5 +1,7 @@
 # drone-system
 
+Приложение для получения телеметрии через спутниковую систему Гонец, для отслеживания БЭКов вне зоне действия их стандартных систем связи.
+
 # Set TRAEFIK_HASH_PASS
 
 Look offical docs from [traefik](https://doc.traefik.io/traefik/middlewares/http/basicauth/)
