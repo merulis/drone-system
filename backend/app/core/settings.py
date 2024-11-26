@@ -22,6 +22,11 @@ class Gonets(BaseSettings):
     MAIN_ROUTE: str
 
     LIST_MESSAGE_ROUTE: str
+    LIST_MESSAGE_USER_ID: str = "ID"
+    COOKIE_USER_LOGIN: str = "userLoginGS"
+
+    LOGIN: str
+    PASSWORD: str
     LIST_MESSAGE_JSON: dict = {
         "what": "send",
         "muid": "",
@@ -36,11 +41,6 @@ class Gonets(BaseSettings):
         "jtPageSize": "20",
         "jtSorting": "m_DT DESC",
     }
-    LIST_MESSAGE_USER_ID: str = "ID"
-    COOKIE_USER_LOGIN: str = "userLoginGS"
-
-    LOGIN: str
-    PASSWORD: str
 
 
 class AutoCaptcha(BaseSettings):
@@ -82,13 +82,13 @@ class Celery(BaseSettings):
     BROKER_SCHEME: str
     BROKER_HOST: str
     BROKER_PORT: str
-    BROKER_PASSWORD: str
+    BROKER_PASSWORD: str = ""
     BROKER_DB: str
 
     BACKEND_SCHEME: str
     BACKEND_HOST: str
     BACKEND_PORT: str
-    BACKEND_PASSWORD: str
+    BACKEND_PASSWORD: str = ""
     BACKEND_DB: str
 
     @computed_field
@@ -106,11 +106,11 @@ class Celery(BaseSettings):
     @property
     def BACKEND_URL(self) -> RedisDsn:
         return MultiHostUrl.build(
-            scheme=self.BROKER_SCHEME,
-            password=self.BROKER_PASSWORD,
-            host=self.BROKER_HOST,
-            port=self.BROKER_PORT,
-            path=self.BROKER_DB,
+            scheme=self.BACKEND_SCHEME,
+            password=self.BACKEND_PASSWORD,
+            host=self.BACKEND_HOST,
+            port=self.BACKEND_PORT,
+            path=self.BACKEND_DB,
         )
 
 
@@ -118,10 +118,10 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "drone-system"
     API_PREFIX: str = "/api/v1"
 
+    GONETS: Gonets = Gonets()
     CELERY: Celery = Celery()
     CAPTCHA: AutoCaptcha = AutoCaptcha()
     MQTT: Mqtt = Mqtt()
-    GONETS: Gonets = Gonets()
 
 
 settings = Settings()
