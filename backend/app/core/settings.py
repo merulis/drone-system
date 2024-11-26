@@ -81,14 +81,14 @@ class Celery(BaseSettings):
 
     BROKER_SCHEME: str
     BROKER_HOST: str
-    BROKER_PORT: str
-    BROKER_PASSWORD: str = ""
+    BROKER_PORT: int
+    BROKER_PASSWORD: str | None = None
     BROKER_DB: str
 
     BACKEND_SCHEME: str
     BACKEND_HOST: str
-    BACKEND_PORT: str
-    BACKEND_PASSWORD: str = ""
+    BACKEND_PORT: int
+    BACKEND_PASSWORD: str | None = None
     BACKEND_DB: str
 
     @computed_field
@@ -96,7 +96,7 @@ class Celery(BaseSettings):
     def BROCKER_URL(self) -> RedisDsn:
         return MultiHostUrl.build(
             scheme=self.BROKER_SCHEME,
-            password=self.BROKER_PASSWORD,
+            # password=self.BROKER_PASSWORD,
             host=self.BROKER_HOST,
             port=self.BROKER_PORT,
             path=self.BROKER_DB,
@@ -107,7 +107,7 @@ class Celery(BaseSettings):
     def BACKEND_URL(self) -> RedisDsn:
         return MultiHostUrl.build(
             scheme=self.BACKEND_SCHEME,
-            password=self.BACKEND_PASSWORD,
+            # password=self.BACKEND_PASSWORD,
             host=self.BACKEND_HOST,
             port=self.BACKEND_PORT,
             path=self.BACKEND_DB,
