@@ -51,7 +51,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       # add Let's Encrypt certs
-      - ./certificates:/certificates
+      - ./infrastructure/certificates:/certificates
 
 
   grafana:
@@ -124,8 +124,8 @@ services:
       - "9001:9001"
 
     volumes:
-      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw
-      - ./mosquitto/passwdfile:/mosquitto/config/passwdfile:rw
+      - ./infrastructure/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw
+      - ./infrastructure/mosquitto/passwdfile:/mosquitto/config/passwdfile:rw
 
 
   mqtt-web:
