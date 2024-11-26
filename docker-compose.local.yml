@@ -25,9 +25,19 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker"
+      - "--entrypoints.web.address=:80"
+
       - "--log.level=DEBUG"
       - "--providers.docker.exposedByDefault=false"
       - "--providers.docker.network=local"
+
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=local
+      - traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)
+    
+    networks:
+      - local
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -90,6 +100,15 @@ services:
   #     - ./mosquitto/passwdfile:/mosquitto/config/passwdfile:rw
 
 
+  # mqtt-web:
+  #   image: emqx/mqttx-web
+  #   container_name: mqtt-web
+
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.mqtt.rule=Host(`mqtt.localhost`)"
+
+
   redis:
     image: redis:latest
     container_name: redis
@@ -100,14 +119,8 @@ services:
     volumes:
       - redis_data:/data
 
-
-  # mqtt-web:
-  #   image: emqx/mqttx-web
-  #   container_name: mqtt-web
-
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.mqtt.rule=Host(`mqtt.localhost`)"
+    networks:
+      - local
 
 
   backend:
@@ -116,6 +129,8 @@ services:
     build:
       context: ./backend
       dockerfile: ./dockerfile
+
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
     env_file:
       - .env
@@ -129,30 +144,42 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.backend-http.rule=Host(`api.localhost`)
+      - traefik.http.services.backend-http.loadbalancer.server.port=8000
+    
+    networks:
+      - local
 
 
   celery_worker:
     container_name: celery_worker
     build: ./backend
+
     command: celery -A app.background.worker.celery worker --loglevel=info
+
+    user: "1000:1000"
 
     volumes:
       - ./backend:/app
 
-    environment:
-      - CELERY_BROKER_SCHEME=&{CELERY_BROKER_SCHEME}
-      - CELERY_BROKER_HOST=&{CELERY_BROKER_HOST}
-      - CELERY_BROKER_PORT=&{CELERY_BROKER_PORT}
-      - CELERY_BROKER_PASSWORD=&{CELERY_BROKER_PASSWORD}
-      - CELERY_BROKER_DB=&{CELERY_BROKER_DB}
+    env_file:
+      - .env
 
-      - CELERY_BACKEND_SCHEME=&{CELERY_BACKEND_SCHEME}
-      - CELERY_BACKEND_HOST=&{CELERY_BACKEND_HOST}
-      - CELERY_BACKEND_PORT=&{CELERY_BACKEND_PORT}
-      - CELERY_BACKEND_PASSWORD=&{CELERY_BACKEND_PASSWORD}
-      - CELERY_BACKEND_DB=&{CELERY_BACKEND_DB}
+    environment:
+      - CELERY_BROKER_SCHEME=${CELERY_BROKER_SCHEME}
+      - CELERY_BROKER_HOST=${CELERY_BROKER_HOST}
+      - CELERY_BROKER_PORT=${CELERY_BROKER_PORT}
+      - CELERY_BROKER_PASSWORD=${CELERY_BROKER_PASSWORD}
+      - CELERY_BROKER_DB=${CELERY_BROKER_DB}
+
+      - CELERY_BACKEND_SCHEME=${CELERY_BACKEND_SCHEME}
+      - CELERY_BACKEND_HOST=${CELERY_BACKEND_HOST}
+      - CELERY_BACKEND_PORT=${CELERY_BACKEND_PORT}
+      - CELERY_BACKEND_PASSWORD=${CELERY_BACKEND_PASSWORD}
+      - CELERY_BACKEND_DB=${CELERY_BACKEND_DB}
+
+    networks:
+      - local
 
     depends_on:
       - backend
       - redis
-
