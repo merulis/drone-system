@@ -115,6 +115,9 @@ class Celery(BaseSettings):
 
 
 class Settings(BaseSettings):
+    PROJECT_NAME: str = "drone-system"
+    API_PREFIX: str = "/api/v1"
+
     CELERY: Celery = Celery()
     CAPTCHA: AutoCaptcha = AutoCaptcha()
     MQTT: Mqtt = Mqtt()
