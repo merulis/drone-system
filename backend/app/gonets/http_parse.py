@@ -1,16 +1,18 @@
-from aiohttp import ClientSession
+from requests import Session
+
 from app.core.settings import settings
 
 
-async def get_messages(cookies, user_id):
-    async with ClientSession(cookies=cookies) as session:
+def get_messages(cookies, user_id):
+    with Session() as session:
         url = settings.GONETS.BASE_URL + settings.GONETS.LIST_MESSAGE_ROUTE
 
         json = settings.GONETS.LIST_MESSAGE_JSON
         json[settings.GONETS.LIST_MESSAGE_USER_ID] = user_id
 
-        async with session.post(
+        with session.post(
             url=url,
+            cookies=cookies,
             headers={
                 "Accept": "application/json, text/javascript, */*; q=0.01",
                 "Accept-Language": "en-US,en;q=0.5",
@@ -19,7 +21,8 @@ async def get_messages(cookies, user_id):
             },
             json=json,
         ) as response:
-            status = response.status
-            message_json = await response.json()
+            response.encoding = "utf-8"
+            status = response.status_code
+            message_json = response.json()
 
         return status, message_json
