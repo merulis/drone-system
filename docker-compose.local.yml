@@ -1,6 +1,6 @@
 networks:
-  local:
-    external: false
+  traefik-public:
+    external: true
 
 
 volumes:
@@ -27,17 +27,17 @@ services:
       - "--providers.docker"
       - "--entrypoints.web.address=:80"
 
-      - "--log.level=DEBUG"
       - "--providers.docker.exposedByDefault=false"
-      - "--providers.docker.network=local"
+      - "--providers.docker.network=traefik-public"
+
+      - "--log.level=DEBUG"
 
     labels:
       - traefik.enable=true
-      - traefik.docker.network=local
       - traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)
     
     networks:
-      - local
+      - traefik-public
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -66,7 +66,7 @@ services:
   #   image: adminer
   #   restart: always
   #   networks:
-  #     - local
+  #     - backend
   #   depends_on:
   #     - db
   #   environment:
@@ -74,8 +74,8 @@ services:
   #   labels:
   #     - traefik.enable=true
 
-  #     - traefik.docker.network=local
-  #     - traefik.constraint-label=local
+  #     - traefik.docker.network=backend
+  #     - traefik.constraint-label=backend
 
   #     - traefik.http.routers.adminer-http.rule=Host(`adminer.localhost`)
   #     - traefik.http.routers.adminer-http.entrypoints=http
@@ -120,7 +120,7 @@ services:
       - redis_data:/data
 
     networks:
-      - local
+      - traefik-public
 
 
   backend:
@@ -143,20 +143,21 @@ services:
 
     labels:
       - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
+
       - traefik.http.routers.backend-http.rule=Host(`api.localhost`)
       - traefik.http.services.backend-http.loadbalancer.server.port=8000
     
     networks:
-      - local
+      - traefik-public
 
 
   celery_worker:
-    container_name: celery_worker
+    container_name: celery-worker
     build: ./backend
 
-    command: celery -A app.background.worker.celery worker --loglevel=info
-
-    user: "1000:1000"
+    command: bash scripts/celery_worker_start.sh
 
     volumes:
       - ./backend:/app
@@ -178,8 +179,35 @@ services:
       - CELERY_BACKEND_DB=${CELERY_BACKEND_DB}
 
     networks:
-      - local
+      - traefik-public
 
     depends_on:
       - backend
       - redis
+
+
+  flower:
+    container_name: celery-flower
+    build: ./backend
+
+    command: celery -A app.background.worker.celery --broker=redis://redis:6379/0 flower --port=5555 
+
+    ports:
+      - "5555:5555"
+
+    env_file:
+      - .env
+
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
+
+      - traefik.http.routers.flower.rule=Host(`flower.localhost`)
+      - traefik.http.services.flower.loadbalancer.server.port=5555
+
+    depends_on:
+      - redis
+
+    networks:
+      - traefik-public
