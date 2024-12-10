@@ -1,9 +1,20 @@
 from fastapi import FastAPI
 
+from contextlib import asynccontextmanager
+
 from app.core.settings import settings
 from app.api.main import router as api_router
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    yield
+    # pre shutdown actions
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.PROJECT_NAME,
 )
 
