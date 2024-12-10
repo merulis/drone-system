@@ -4,14 +4,18 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 from app.core.settings import settings
-from app.gonets.http_parse import get_messages
+from app.gonets.http_parse import get_list_messages
 from app.gonets.captcha_solver import (
     get_captcha_as_base64_or_none,
     solve_captcha,
 )
 
 
+COOKIE_USER_LOGIN: str = "userLoginGS"
+
+
 def create_webdriver(
+    remote_url: str = None,
     options: list | None = None,
 ) -> webdriver.Chrome:
     if not options:
@@ -20,7 +24,15 @@ def create_webdriver(
     driver_options = webdriver.ChromeOptions()
     [driver_options.add_argument(option) for option in options]
 
-    driver = webdriver.Chrome(options=driver_options)
+    if remote_url:
+        driver = webdriver.Remote(
+            command_executor=remote_url,
+            options=driver_options,
+        )
+    else:
+        driver = webdriver.Chrome(
+            options=driver_options,
+        )
 
     return driver
 
@@ -54,11 +66,16 @@ def get_cookies_http_format(
 
 
 def get_user_id_from_cookies(cookies):
-    return cookies.get(settings.GONETS.COOKIE_USER_LOGIN)
+    return cookies.get(COOKIE_USER_LOGIN)
 
 
-def parse_message():
-    with create_webdriver() as driver:
+def get_gonets_info(remote_url: str | None = None):
+    if remote_url:
+        driver = create_webdriver(remote_url)
+    else:
+        driver = create_webdriver()
+
+    with driver:
         driver.get(settings.GONETS.BASE_URL + settings.GONETS.LOGIN_ROUTE)
 
         if not (encoded_captcha := get_captcha_as_base64_or_none(driver)):
@@ -70,9 +87,6 @@ def parse_message():
         selenuim_cookies = get_cookies_http_format(driver)
         user_id = get_user_id_from_cookies(selenuim_cookies)
 
-    status, json = get_messages(selenuim_cookies, user_id)
+    messages = get_list_messages(selenuim_cookies, user_id)
 
-    return status, json
-
-
-print(parse_message())
+    return messages
