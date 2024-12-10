@@ -3,7 +3,6 @@ import requests
 from app.gonets.models import (
     ListMessageBody,
     ListMessageHeaders,
-    custom_adict,
 )
 from app.core.settings import settings
 
@@ -23,11 +22,8 @@ def get_list_messages(cookies, user_id):
     with requests.Session() as session:
         url = settings.GONETS.BASE_URL + settings.GONETS.LIST_MESSAGE_ROUTE
 
-        body = custom_adict(ListMessageBody(uid=str(user_id)))
-        headers = custom_adict(ListMessageHeaders())
-
-        print(body)
-        print(headers)
+        body = ListMessageBody(uid=str(user_id)).to_dict()
+        headers = ListMessageHeaders().to_dict()
 
         with session.post(
             url=url,

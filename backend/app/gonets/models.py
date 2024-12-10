@@ -2,8 +2,20 @@ from dataclasses import dataclass, field
 import typing
 
 
+class ADictMixin:
+    def to_dict(self):
+        result = {}
+
+        for data_field in self.__dataclass_fields__.values():
+            key = data_field.metadata.get("key", data_field.name)
+            value = getattr(self, data_field.name)
+            result.setdefault(key, value)
+
+        return result
+
+
 @dataclass
-class ListMessageHeaders:
+class ListMessageHeaders(ADictMixin):
     accept_language: str = field(
         default="en-US,en;q=0.5",
         metadata={"key": "Accept-Language"},
@@ -23,7 +35,7 @@ class ListMessageHeaders:
 
 
 @dataclass
-class ListMessageBody:
+class ListMessageBody(ADictMixin):
     what: typing.Literal[
         "input",
         "output",
@@ -65,14 +77,3 @@ class ListMessageBody:
 
 
 MyDataClasses = typing.Union[ListMessageBody, ListMessageHeaders]
-
-
-def custom_adict(instanse: MyDataClasses):
-    result = {}
-
-    for data_field in instanse.__dataclass_fields__.values():
-        key = data_field.metadata.get("key", data_field.name)
-        value = getattr(instanse, data_field.name)
-        result.setdefault(key, value)
-
-    return result
