@@ -1,28 +1,41 @@
-from requests import Session
+import requests
 
+from app.gonets.models import (
+    ListMessageBody,
+    ListMessageHeaders,
+    custom_adict,
+)
 from app.core.settings import settings
 
 
-def get_messages(cookies, user_id):
-    with Session() as session:
+def get_result_or_none(response: requests.Response) -> list[dict]:
+    json = response.json()
+    print(json)
+    data = json.get("d")
+    result = data.get("Result")
+    if result == "OK":
+        records = data.get("Records")
+        return records
+    return None
+
+
+def get_list_messages(cookies, user_id):
+    with requests.Session() as session:
         url = settings.GONETS.BASE_URL + settings.GONETS.LIST_MESSAGE_ROUTE
 
-        json = settings.GONETS.LIST_MESSAGE_JSON
-        json[settings.GONETS.LIST_MESSAGE_USER_ID] = user_id
+        body = custom_adict(ListMessageBody(uid=str(user_id)))
+        headers = custom_adict(ListMessageHeaders())
+
+        print(body)
+        print(headers)
 
         with session.post(
             url=url,
             cookies=cookies,
-            headers={
-                "Accept": "application/json, text/javascript, */*; q=0.01",
-                "Accept-Language": "en-US,en;q=0.5",
-                "Accept-Encoding": "gzip, deflate, br, zstd",
-                "Content-Type": "application/json; charset=utf-8,",
-            },
-            json=json,
+            headers=headers,
+            json=body,
         ) as response:
             response.encoding = "utf-8"
-            status = response.status_code
-            message_json = response.json()
+            messages = get_result_or_none(response)
 
-        return status, message_json
+        return messages
