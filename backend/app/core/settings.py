@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from pydantic_core import MultiHostUrl
-from pydantic import RedisDsn, computed_field
+from pydantic import RedisDsn, AnyUrl, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,25 +22,29 @@ class Gonets(BaseSettings):
     MAIN_ROUTE: str
 
     LIST_MESSAGE_ROUTE: str
-    LIST_MESSAGE_USER_ID: str = "ID"
-    COOKIE_USER_LOGIN: str = "userLoginGS"
 
     LOGIN: str
     PASSWORD: str
-    LIST_MESSAGE_JSON: dict = {
-        "what": "send",
-        "muid": "",
-        "track": "1",
-        "UIDA": "",
-        "Src": "",
-        "DateFrom": "",
-        "DateTo": "",
-        "noUpdate": 1,
-        "ID": "",
-        "jtStartIndex": "0",
-        "jtPageSize": "20",
-        "jtSorting": "m_DT DESC",
-    }
+
+    @computed_field
+    @property
+    def REMOTE_DRIVER_URL(self) -> AnyUrl:
+        return MultiHostUrl.build(
+            scheme="http",
+            host="webdriver",
+            port=4444,
+            path="wd/hub",
+        )
+
+    @computed_field
+    @property
+    def REMOTE_DRIVER_STATUS(self) -> AnyUrl:
+        return MultiHostUrl.build(
+            scheme="http",
+            host="webdriver",
+            port=4444,
+            path="status",
+        )
 
 
 class AutoCaptcha(BaseSettings):
