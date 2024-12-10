@@ -148,6 +148,22 @@ services:
 
       - traefik.http.routers.backend-http.rule=Host(`api.localhost`)
       - traefik.http.services.backend-http.loadbalancer.server.port=8000
+  
+    depends_on:
+      - webdriver
+
+    networks:
+      - traefik-public
+
+
+  webdriver:
+    image: selenium/standalone-chrome
+    container_name: webdriver
+
+    ports:
+      - "4444:4444"
+
+    shm_size: "2g"
     
     networks:
       - traefik-public
@@ -157,7 +173,7 @@ services:
     container_name: celery-worker
     build: ./backend
 
-    command: bash scripts/celery_worker_start.sh
+    command: celery -A app.background.worker.celery worker --loglevel=INFO
 
     volumes:
       - ./backend:/app
@@ -183,6 +199,28 @@ services:
 
     depends_on:
       - backend
+      - webdriver
+      - redis
+
+
+  celery-beat:
+    container_name: celery_beat
+    build: ./backend
+
+    command: celery -A app.background.worker.celery beat --loglevel=INFO
+
+    volumes:
+      - ./backend:/app
+
+    env_file:
+      - .env
+
+    networks:
+      - traefik-public
+
+    depends_on:
+      - backend
+      - webdriver
       - redis
 
 
