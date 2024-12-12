@@ -1,8 +1,17 @@
 from pathlib import Path
 
 from pydantic_core import MultiHostUrl
-from pydantic import RedisDsn, AnyUrl, computed_field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import (
+    BaseModel,
+    RedisDsn,
+    PostgresDsn,
+    AnyUrl,
+    computed_field,
+)
+from pydantic_settings import (
+    BaseSettings,
+    SettingsConfigDict,
+)
 
 
 BASE_DIR = Path(__file__).parent.parent.parent.parent
@@ -59,19 +68,26 @@ class AutoCaptcha(BaseSettings):
     API_KEY: str
 
 
-class Mqtt(BaseSettings):
-    model_config = SettingsConfigDict(
-        # Dump constants from top level /.env file
-        env_file=BASE_DIR / ".env",
-        env_prefix="MQTT_",
-        env_ignore_empty=True,
-        extra="ignore",
-    )
+class DBSettings(BaseModel):
+    POSTGRES_DRIVER: str = "postgresql+asyncpg"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str = "dev_db"
+    ECHO: bool = False  # True only for dev
 
-    HOST: str
-    PORT: int
-    USER: str
-    PASSWORD: str
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def SQLALCHEMY_DATABASE_URL(self) -> PostgresDsn:
+        return MultiHostUrl.build(
+            scheme=self.POSTGRES_DRIVER,
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_SERVER,
+            port=self.POSTGRES_PORT,
+            path=self.POSTGRES_DB,
+        )
 
 
 class Celery(BaseSettings):
@@ -122,10 +138,11 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "drone-system"
     API_PREFIX: str = "/api/v1"
 
+    DB: DBSettings = DBSettings()
+
     GONETS: Gonets = Gonets()
     CELERY: Celery = Celery()
     CAPTCHA: AutoCaptcha = AutoCaptcha()
-    MQTT: Mqtt = Mqtt()
 
 
 settings = Settings()
