@@ -98,6 +98,3 @@ def get_gonets_info(
     )
 
     return messages
-
-
-print(get_gonets_info(date_from=datetime.now(), date_to=datetime.now()))
