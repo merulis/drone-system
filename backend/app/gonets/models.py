@@ -2,20 +2,83 @@ from dataclasses import dataclass, field
 import typing
 
 
-class ADictMixin:
-    def to_dict(self):
-        result = {}
-
-        for data_field in self.__dataclass_fields__.values():
-            key = data_field.metadata.get("key", data_field.name)
-            value = getattr(self, data_field.name)
-            result.setdefault(key, value)
-
-        return result
+T = typing.TypeVar("T", bound="DictMixin")
 
 
 @dataclass
-class ListMessageHeaders(ADictMixin):
+class DictMixin:
+    def model_dump(
+        self,
+        metadata: bool = True,
+    ) -> dict:
+        """
+        Serializes the dataclass instance into a dictionary,
+        using metadata keys if provided.
+        """
+        result = {}
+
+        for data_field in self.__dataclass_fields__.values():
+            key = (
+                data_field.metadata.get("key", data_field.name)
+                if metadata
+                else data_field.name
+            )
+            value = getattr(self, data_field.name)
+            if value is not None:
+                result[key] = value
+
+        return result
+
+    @classmethod
+    def model_from_dict(
+        cls: typing.Type[T],
+        data: dict,
+        metadata: bool = True,
+    ) -> T:
+        """
+        Creates an instance of the dataclass from a data dictionary.
+
+        Args:
+            data (dict): The input data dictionary.
+            metadata (bool): If True, uses the field's metadata key ("key")
+                from metadata["key"]. If False, uses the field's name.
+
+        Returns:
+            T: A new instance of the class.
+        """
+        instance = cls.__new__(cls)
+
+        for data_field in cls.__dataclass_fields__.values():
+            key = (
+                data_field.metadata.get("key", data_field.name)
+                if metadata
+                else data_field.name
+            )
+            if key in data:
+                if not isinstance(data[key], data_field.type):
+                    t_expected = data_field.type
+                    field = data_field.name
+                    t_got = type(data[key])
+                    raise TypeError(
+                        f"Expected {t_expected} for field {field}, got {t_got}"
+                    )
+                setattr(instance, data_field.name, data[key])
+
+        return instance
+
+
+@dataclass
+class GonetsCookies(DictMixin):
+    username: str = field(metadata={"key": "userNameGS"})
+    fullname: str = field(metadata={"key": "fullNameGS"})
+    login: str = field(metadata={"key": "userLoginGS"})
+    client: str = field(metadata={"key": "userClientGS"})
+    id_session: str = field(metadata={"key": "ASP.NET_SessionId"})
+    true_user: str = field(metadata={"key": "trueUserV"})
+
+
+@dataclass
+class ListMessageHeaders(DictMixin):
     accept_language: str = field(
         default="en-US,en;q=0.5",
         metadata={"key": "Accept-Language"},
@@ -35,7 +98,7 @@ class ListMessageHeaders(ADictMixin):
 
 
 @dataclass
-class ListMessageBody(ADictMixin):
+class ListMessageBody(DictMixin):
     what: typing.Literal[
         "input",
         "output",
@@ -48,7 +111,10 @@ class ListMessageBody(ADictMixin):
         default="",
         metadata={"key": "UIDA"},
     )
-    uid: str = field(default="", metadata={"key": "ID"},)
+    uid: str = field(
+        default="",
+        metadata={"key": "ID"},
+    )
     src: str = field(default="", metadata={"key": "Src"})
     date_from: str = field(
         default="",
