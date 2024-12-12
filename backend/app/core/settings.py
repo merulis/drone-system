@@ -72,7 +72,7 @@ class DBSettings(BaseModel):
     POSTGRES_DRIVER: str = "postgresql+asyncpg"
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_SERVER: str = "db"
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "dev_db"
     ECHO: bool = False  # True only for dev
