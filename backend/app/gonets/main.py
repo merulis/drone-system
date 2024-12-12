@@ -1,5 +1,7 @@
 from urllib import parse
 
+from datetime import datetime
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -9,9 +11,7 @@ from app.gonets.captcha_solver import (
     get_captcha_as_base64_or_none,
     solve_captcha,
 )
-
-
-COOKIE_USER_LOGIN: str = "userLoginGS"
+from app.gonets.models import GonetsCookies
 
 
 def create_webdriver(
@@ -50,26 +50,28 @@ def fill_form_and_enter(driver: webdriver.Chrome, result):
     enter_button.click()
 
 
-def get_cookies_http_format(
-    driver: webdriver.Chrome,
-) -> dict:
+def format_cookies_to_model(
+    cookies_in: list,
+) -> GonetsCookies:
     def set_cookie(cookies, cookie):
         cookies.setdefault(
             cookie.get("name"),
             parse.quote(cookie.get("value")),
         )
 
-    cookies = {}
-    [set_cookie(cookies, cookie) for cookie in driver.get_cookies()]
+    cookies_dict = {}
+    [set_cookie(cookies_dict, cookie) for cookie in cookies_in]
+
+    cookies = GonetsCookies.model_from_dict(cookies_dict)
 
     return cookies
 
 
-def get_user_id_from_cookies(cookies):
-    return cookies.get(COOKIE_USER_LOGIN)
-
-
-def get_gonets_info(remote_url: str | None = None):
+def get_gonets_info(
+    remote_url: str | None = None,
+    date_from: datetime | None = None,
+    date_to: None = None,
+):
     if remote_url:
         driver = create_webdriver(remote_url)
     else:
@@ -84,9 +86,18 @@ def get_gonets_info(remote_url: str | None = None):
         result = solve_captcha(encoded_captcha)
         fill_form_and_enter(driver, result)
 
-        selenuim_cookies = get_cookies_http_format(driver)
-        user_id = get_user_id_from_cookies(selenuim_cookies)
+        selenium_cookies = driver.get_cookies()
+        cookies = format_cookies_to_model(selenium_cookies)
+        uid = cookies.login
 
-    messages = get_list_messages(selenuim_cookies, user_id)
+    messages = get_list_messages(
+        cookies=cookies.model_dump(),
+        uid=uid,
+        date_from=date_from,
+        date_to=date_to,
+    )
 
     return messages
+
+
+print(get_gonets_info(date_from=datetime.now(), date_to=datetime.now()))
