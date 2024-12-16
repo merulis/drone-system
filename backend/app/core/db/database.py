@@ -30,7 +30,6 @@ class DataBase:
         """return new sqlalchemy.AsyncSession"""
         async with self.session_factory() as session:
             yield session
-            await session.close()
 
     async def scoped_session_dependency(self):
         """
