@@ -11,7 +11,7 @@ from app.gonets.captcha_solver import (
     get_captcha_as_base64_or_none,
     solve_captcha,
 )
-from app.gonets.models import GonetsCookies
+from app.schemas.gonets import GonetsCookies
 
 
 def create_webdriver(
@@ -62,7 +62,7 @@ def format_cookies_to_model(
     cookies_dict = {}
     [set_cookie(cookies_dict, cookie) for cookie in cookies_in]
 
-    cookies = GonetsCookies.model_from_dict(cookies_dict)
+    cookies = GonetsCookies(**cookies_dict)
 
     return cookies
 
@@ -70,7 +70,7 @@ def format_cookies_to_model(
 def get_gonets_info(
     remote_url: str | None = None,
     date_from: datetime | None = None,
-    date_to: None = None,
+    date_to: datetime | None = None,
 ):
     if remote_url:
         driver = create_webdriver(remote_url)
@@ -91,10 +91,13 @@ def get_gonets_info(
         uid = cookies.login
 
     messages = get_list_messages(
-        cookies=cookies.model_dump(),
+        cookies=cookies.model_dump(by_alias=True),
         uid=uid,
         date_from=date_from,
         date_to=date_to,
     )
 
     return messages
+
+
+print(get_gonets_info())
