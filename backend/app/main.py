@@ -8,7 +8,6 @@ from app.api.main import router as api_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
     yield
     # pre shutdown actions
 
