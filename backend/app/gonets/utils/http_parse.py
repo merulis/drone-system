@@ -2,7 +2,7 @@ import requests
 
 from datetime import datetime
 
-from app.schemas.gonets import (
+from app.gonets.schemas.gonets import (
     ListMessageBody,
     ListMessageHeaders,
 )
