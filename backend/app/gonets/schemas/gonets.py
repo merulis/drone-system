@@ -1,5 +1,7 @@
 import typing
 
+from datetime import datetime
+
 from pydantic import (
     BaseModel,
     Field,
@@ -9,7 +11,7 @@ from pydantic import (
 
 class GonetsCookies(BaseModel):
     model_config = ConfigDict(
-        extra="ignore", 
+        extra="ignore",
         populate_by_name=True,
     )
 
@@ -109,3 +111,18 @@ class ListMessageBody(BaseModel):
         default="m_DT DESC",
         serialization_alias="jtSorting",
     )
+
+
+class GonetsMessage(BaseModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+        extra="ignore",
+    )
+
+    mid: int = Field(..., alias="idMessage")
+    timestamp: datetime = Field(..., alias="m_DT")
+    priority: str = Field(..., alias="m_Priority")
+    subject: str = Field(..., alias="m_Subject")
+    body: str = Field(..., alias="m_Body")
+    read_status: bool = Field(..., alias="m_Read")
+    deleted: bool = Field(..., alias="m_Del")
