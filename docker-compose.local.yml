@@ -19,7 +19,7 @@ services:
     ports:
       - "80:80"
       - "8080:8080"
-    
+
     restart: always
 
     command:
@@ -35,7 +35,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)
-    
+
     networks:
       - traefik-public
 
@@ -148,7 +148,7 @@ services:
 
       - traefik.http.routers.backend-http.rule=Host(`api.localhost`)
       - traefik.http.services.backend-http.loadbalancer.server.port=8000
-  
+
     depends_on:
       - webdriver
 
@@ -164,7 +164,7 @@ services:
       - "4444:4444"
 
     shm_size: "2g"
-    
+
     networks:
       - traefik-public
 
@@ -226,7 +226,7 @@ services:
     container_name: celery-flower
     build: ./backend
 
-    command: celery -A app.background.main.celery --broker=redis://redis:6379/0 flower --port=5555 
+    command: celery -A app.background.main.celery --broker=redis://redis:6379/0 flower --port=5555
 
     ports:
       - "5555:5555"

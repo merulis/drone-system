@@ -2,7 +2,7 @@ networks:
   default:
     name: proxynet
     external: true
-  
+
   monitor-net:
     driver: bridge
 
@@ -26,7 +26,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    
+
     restart: always
 
     command:
@@ -63,7 +63,7 @@ services:
       - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
       - traefik.http.routers.grafana.entrypoints=https
 
-  
+
   prometheus:
     image: prom/prometheus:main
     container_name: prometheus
@@ -96,11 +96,11 @@ services:
 
     restart: unless-stopped
 
-  
+
   cadvisor:
     image: google/cadvisor:latest
     container_name: cadvisor
-    
+
     labels:
       - traefik.enable=true
       - traefik.http.routers.cadvisor.rule=Host(`cadvisor.${DOMAIN}`)

@@ -1,5 +1,3 @@
 from .message import Message
 
-__all__ = (
-    "Message",
-)
+__all__ = ("Message",)

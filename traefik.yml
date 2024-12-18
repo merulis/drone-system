@@ -10,14 +10,14 @@ entryPoints:
 
   websecure:
     address: ":443"
-  
+
 certificatesResolvers:
   le:
     acme:
       email: ${EMAIL}
       storage: /certificates/acme.json
       tlsChallenge: {}
-  
+
 
 providers:
   docker:
