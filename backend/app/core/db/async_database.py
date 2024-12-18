@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import (
     async_scoped_session,
 )
 
-from app.core.settings import settings
+from app.core import settings
 
 
-class DataBase:
+class AsyncDataBase:
     def __init__(self, url: str, echo: bool = False):
         self.engine = create_async_engine(url=url, echo=echo)
         self.session_factory = async_sessionmaker(
@@ -37,10 +37,10 @@ class DataBase:
         """
         session = self.get_scoped_session()
         yield session
-        await session.close()
+        await session.remove()
 
 
-database = DataBase(
+async_db = AsyncDataBase(
     str(settings.DB.SQLALCHEMY_DATABASE_URL),
     settings.DB.ECHO,
 )
