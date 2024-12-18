@@ -1,7 +1,7 @@
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.db import Message
+from app.message.models.message import Message
 from app.message.schemas.message import MessageCreate
 
 from app.message.repositories.repository_interface import IRepository
