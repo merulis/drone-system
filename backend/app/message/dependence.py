@@ -3,14 +3,14 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import async_db
-from app.message.repositories.repository import MessageRepository
-from app.message.repositories.repository_interface import IRepository
-from app.message.services.service import MessageService
-from app.message.services.service_interface import IMessageService
+from .repositories.repository import MessageRepository
+from .repositories.interface import IRepository
+from .services.service import MessageService
+from .services.interface import IMessageService
 
 
 def get_message_repository(
-    session: AsyncSession = Depends(async_db.scoped_session_dependency),
+    session: AsyncSession = Depends(async_db.session_dependency),
 ) -> MessageRepository:
     return MessageRepository(session)
 

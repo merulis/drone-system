@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.message.models.message import Message
 from app.message.schemas.message import MessageCreate
 
-from app.message.repositories.repository_interface import IRepository
+from app.message.repositories.interface import IRepository
 
 
 class MessageRepository(IRepository[Message, MessageCreate]):

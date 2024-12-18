@@ -1,7 +1,7 @@
 from app.message.schemas.message import Message, MessageCreate
 
-from app.message.services.service_interface import IMessageService
-from app.message.repositories.repository_interface import IRepository
+from app.message.services.interface import IMessageService
+from app.message.repositories.interface import IRepository
 
 
 class MessageService(IMessageService):
