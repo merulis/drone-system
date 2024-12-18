@@ -6,12 +6,13 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 from app.core import settings
-from app.gonets.utils.http_parse import get_list_messages
-from app.gonets.utils.captcha_solver import (
+
+from .utils.http_parse import get_list_messages
+from .utils.captcha_solver import (
     get_captcha_as_base64_or_none,
     solve_captcha,
 )
-from app.gonets.schemas.gonets import GonetsCookies
+from .schemas.gonets import GonetsCookies
 
 
 def create_webdriver(
