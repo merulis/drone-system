@@ -173,7 +173,7 @@ services:
     container_name: celery-worker
     build: ./backend
 
-    command: celery -A app.background.worker.celery worker --loglevel=INFO
+    command: celery -A app.background.main.celery worker --loglevel=INFO
 
     volumes:
       - ./backend:/app
@@ -207,7 +207,7 @@ services:
     container_name: celery_beat
     build: ./backend
 
-    command: celery -A app.background.worker.celery beat --loglevel=INFO
+    command: celery -A app.background.main.celery beat --loglevel=INFO
 
     volumes:
       - ./backend:/app
@@ -219,16 +219,14 @@ services:
       - traefik-public
 
     depends_on:
-      - backend
-      - webdriver
-      - redis
+      - celery_worker
 
 
   flower:
     container_name: celery-flower
     build: ./backend
 
-    command: celery -A app.background.worker.celery --broker=redis://redis:6379/0 flower --port=5555 
+    command: celery -A app.background.main.celery --broker=redis://redis:6379/0 flower --port=5555 
 
     ports:
       - "5555:5555"
@@ -245,7 +243,7 @@ services:
       - traefik.http.services.flower.loadbalancer.server.port=5555
 
     depends_on:
-      - redis
+      - celery_worker
 
     networks:
       - traefik-public
