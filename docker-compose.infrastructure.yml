@@ -1,0 +1,160 @@
+networks:
+  default:
+    name: proxynet
+    external: true
+  
+  monitor-net:
+    driver: bridge
+
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxynet
+
+      - traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN}`)
+      - traefik.http.routers.dashboard.entrypoints=https
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.routers.dashboard.middlewares=auth
+
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_HASH_PASSWORD}
+
+    ports:
+      - "80:80"
+      - "443:443"
+    
+    restart: always
+
+    command:
+      - "--api.insecure=false"
+      - "--api.dashboard=true"
+      - "--providers.docker"
+      - "--log.level=DEBUG"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.network=proxynet"
+
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      - "--entrypoints.http.http.redirections.entrypoint.to=https"
+      - "--entrypoints.http.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.http.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.https.http.tls.certResolver=le"
+
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.email=${EMAIL}"
+      - "--certificatesresolvers.le.acme.storage=/certificates/acme.json"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # add Let's Encrypt certs
+      - ./infrastructure/certificates:/certificates
+
+
+  grafana:
+    image: grafana/grafana:latest-ubuntu
+    container_name: grafana
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
+      - traefik.http.routers.grafana.entrypoints=https
+
+  
+  prometheus:
+    image: prom/prometheus:main
+    container_name: prometheus
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)
+      - traefik.http.routers.prometheus.entrypoints=https
+
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.node-exporter.rule=Host(`node-exporter.${DOMAIN}`)
+      - traefik.http.routers.node-exporter.entrypoints=https
+
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+
+    restart: unless-stopped
+
+  
+  cadvisor:
+    image: google/cadvisor:latest
+    container_name: cadvisor
+    
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cadvisor.rule=Host(`cadvisor.${DOMAIN}`)
+      - traefik.http.routers.cadvisor.entrypoints=https
+
+    volumes:
+      - /var/lib/docker:/var/lib/docker:ro
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /proc:/proc:ro
+
+    restart: unless-stopped
+
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+    volumes:
+      - ./infrastructure/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw
+      - ./infrastructure/mosquitto/passwdfile:/mosquitto/config/passwdfile:rw
+
+
+  mqtt-web:
+    image: emqx/mqttx-web
+    container_name: mqtt-web
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mqtt.rule=Host(`mqtt.${DOMAIN}`)
+      - traefik.http.routers.mqtt.entrypoints=https
+      - traefik.http.routers.mqtt.middlewares=auth
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_HASH_PASSWORD}
+
+
+  backend:
+    container_name: backend
+
+    build:
+      context: ./backend
+      dockerfile: ./dockerfile
+
+    env_file:
+      - .env
+
+    environment:
+      - MQTT_HOST=${MQTT_HOST}
+      - MQTT_PORT=${MQTT_PORT}
+      - MQTT_USER=${MQTT_USER}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+
+    depends_on:
+      - mosquitto
