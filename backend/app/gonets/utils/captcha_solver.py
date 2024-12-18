@@ -1,4 +1,5 @@
-from app.core.settings import settings
+from app.core import settings
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from twocaptcha import TwoCaptcha

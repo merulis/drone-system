@@ -6,7 +6,7 @@ from app.gonets.schemas.gonets import (
     ListMessageBody,
     ListMessageHeaders,
 )
-from app.core.settings import settings
+from app.core import settings
 
 
 def get_result_or_none(response: requests.Response) -> list[dict] | None:

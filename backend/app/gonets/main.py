@@ -5,7 +5,7 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from app.core.settings import settings
+from app.core import settings
 from app.gonets.utils.http_parse import get_list_messages
 from app.gonets.utils.captcha_solver import (
     get_captcha_as_base64_or_none,

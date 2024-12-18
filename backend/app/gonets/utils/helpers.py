@@ -2,7 +2,7 @@ import time
 import requests
 import logging
 
-from app.core.settings import settings
+from app.core import settings
 
 VALUE_FIELD = "value"
 STATUS_FIELD = "ready"
