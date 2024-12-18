@@ -35,7 +35,7 @@ class SyncAsyncDataBase:
         session.close()
 
 
-async_db = SyncAsyncDataBase(
+sync_db = SyncAsyncDataBase(
     str(settings.DB.SQLALCHEMY_DATABASE_URL),
     settings.DB.ECHO,
 )
